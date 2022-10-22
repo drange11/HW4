@@ -15,7 +15,7 @@
         }
 
         :root {
-            --hue-neutral: 200;
+            --hue-neutral: 250;
             --hue-wrong: 0;
             --hue-correct: 145;
         }
@@ -40,15 +40,26 @@
             --hue: var(--hue-wrong);
         }
         
+        #info-container {
+            position: absolute;
+            top: 0;
+        }
 
         .container {
             width: 800px;
             max-width: 80%;
-            background-color: white;
+            background-color: rgb(242, 242, 124);
             border-radius: 5px;
             padding: 10px;
             box-shadow: 0 0 10px 2px;
             
+        }
+
+        .options {
+            border: 2px dashed red; 
+            padding: 10px; 
+            border-radius: 30px; 
+            margin: 15px; 
         }
 
         .btn-grid {
@@ -83,7 +94,8 @@
 
         .start-btn,
         .next-btn,
-        .back-btn {
+        .back-btn,
+        .restart-btn {
             font-size: 1.5rem;
             font-weight: bold;
             padding: 10px 20px;
@@ -98,9 +110,6 @@
         .hide {
             display: none;
         }
-        div {
-            overflow: hidden; 
-        }
     </style>
     <script>
 
@@ -109,11 +118,17 @@
 
         function domLoaded() {
             const startButton = document.getElementById('start-btn')
+            const restartButton = document.getElementById('restart-btn')
             const nextButton = document.getElementById('next-btn')
             const backButton = document.getElementById('back-btn')
             const questionContainerElement = document.getElementById('question-container')
+            const settingsContainer = document.getElementById('options')
             const questionElement = document.getElementById('question')
             const answerButtonsElement = document.getElementById('answer-buttons')
+            const selectedOptions = [true, false, false]
+            const shuffleCheck = document.getElementById("shuffle")
+            const timedCheck = document.getElementById("timed")
+            const remCorrectCheck = document.getElementById("remCorrect")
 
             let shuffledQuestions, currentQuestionIndex
             //using the domLoaded function because the buttons need to be rendered before we can
@@ -127,10 +142,33 @@
                 currentQuestionIndex--
                 setNextQuestion()
             })
+            restartButton.addEventListener('click', () => {
+                currentQuestionIndex = 0
+                setNextQuestion()
+            })
+
+
+            shuffleCheck.addEventListener('change', () => {
+                selectedOptions[0] = !selectedOptions[0]
+                console.log(selectedOptions[0])
+            })
+            timedCheck.addEventListener('change', () => {
+                selectedOptions[1] = !selectedOptions[1]
+            })
+            remCorrectCheck.addEventListener('change', () => {
+                selectedOptions[2] = !selectedOptions[2]
+            })
+
 
             function startGame() {
                 startButton.classList.add('hide')
-                shuffledQuestions = questions.sort(() => Math.random() - .5)
+                settingsContainer.classList.add('hide')
+                if(selectedOptions[0]) {
+                    shuffledQuestions = questions.sort(() => Math.random() - .5)
+                }
+                else {
+                    shuffledQuestions = questions
+                }
                 currentQuestionIndex = 0
                 questionContainerElement.classList.remove('hide')
                 setNextQuestion()
@@ -161,8 +199,7 @@
                 }
                 else {
                     nextButton.classList.remove('hide')
-                    startButton.innerText = 'Restart'
-                    startButton.classList.remove('hide')
+                    restartButton.classList.remove('hide')
                 }
             }
 
@@ -170,6 +207,7 @@
                 clearStatusClass(document.body)
                 backButton.classList.add('hide')
                 nextButton.classList.add('hide')
+                restartButton.classList.add('hide')
                 while (answerButtonsElement.firstChild) {
                     answerButtonsElement.removeChild(answerButtonsElement.firstChild)
                 }
@@ -204,7 +242,7 @@
                 if(document.getElementById("extraInfo") == null) {
                     let newDiv = document.createElement("div");
                     newDiv.id = "extraInfo";
-                    newDiv.style = "border: 2px solid black; padding: 10px; border-radius: 30px; margin: 15px; background-color: white;";
+                    newDiv.style = "border: 2px solid black; padding: 10px; border-radius: 30px; margin: 15px; background-color: rgb(242, 242, 124);";
                     document.getElementById("info-container").appendChild(newDiv);
                     
                     let newP = document.createElement("p");
@@ -328,10 +366,25 @@
                 <button class="btn">Answer 4</button>
             </div>
         </div>
+        <div id="options">
+            <p>
+                <label for="shuffle">Shuffle Cards:</label>
+                <input type="checkbox" name="shuffle" id="shuffle" checked>
+            </p>
+            <p>
+                <label for="timed">Timed Session:</label>
+                <input type="checkbox" name="timed" id="timed">
+            </p>
+            <p>
+                <label for="remCorrect">Remove Correct From Deck:</label>
+                <input type="checkbox" name="remCorrect" id="remCorrect">
+            </p>
+        </div>
         <div class="controls">
             <button id="start-btn" class="start-btn btn">Start</button>
             <button id="back-btn" class="back-btn btn hide">Back</button>
             <button id="next-btn" class="next-btn btn hide">Next</button>
+            <button id="restart-btn" class="restart-btn hide">Restart</button>
         </div>
     </div>
 </body>
