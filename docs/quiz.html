@@ -129,6 +129,9 @@
             const shuffleCheck = document.getElementById("shuffle")
             const timedCheck = document.getElementById("timed")
             const remCorrectCheck = document.getElementById("remCorrect")
+            let clock = null;
+            let seconds = 0;
+            let minutes = 0;
 
             let shuffledQuestions, currentQuestionIndex
             //using the domLoaded function because the buttons need to be rendered before we can
@@ -150,7 +153,6 @@
 
             shuffleCheck.addEventListener('change', () => {
                 selectedOptions[0] = !selectedOptions[0]
-                console.log(selectedOptions[0])
             })
             timedCheck.addEventListener('change', () => {
                 selectedOptions[1] = !selectedOptions[1]
@@ -169,9 +171,39 @@
                 else {
                     shuffledQuestions = questions
                 }
+                if(selectedOptions[1]) {
+                    startClock()
+                    document.getElementById('time').classList.remove('hide')
+                }
                 currentQuestionIndex = 0
                 questionContainerElement.classList.remove('hide')
                 setNextQuestion()
+            }
+
+            function startClock() {
+                clock = setInterval(updateClock, 1000);
+            }
+
+            function updateClock() {
+                if(seconds == 59) {
+                    seconds = -1
+                    ++minutes
+                }
+                ++seconds
+                timeNow = "min: " + minutes + " sec: " + seconds 
+                document.getElementById('time').textContent = timeNow;
+                if((seconds + 30 * minutes) % 30 == 0 && seconds != 0) {
+                    document.body.style.backgroundColor = 'hsl(var(--hue-wrong), 100%, 20%)'
+                }
+                if(((seconds + 30 * minutes) - 1) % 30 == 0 && seconds - 1 != 0) {
+                    document.body.style.backgroundColor = 'hsl(var(--hue-neutral), 100%, 20%)'
+                }
+                if(((seconds + 30 * minutes) - 2) % 30 == 0 && seconds - 2 != 0) {
+                    document.body.style.backgroundColor = 'hsl(var(--hue-wrong), 100%, 20%)'
+                }
+                if(((seconds + 30 * minutes) - 3) % 30 == 0 && seconds - 3 != 0) {
+                    document.body.style.backgroundColor = 'hsl(var(--hue-neutral), 100%, 20%)'
+                }
             }
 
             function setNextQuestion() {
@@ -386,6 +418,7 @@
             <button id="next-btn" class="next-btn btn hide">Next</button>
             <button id="restart-btn" class="restart-btn hide">Restart</button>
         </div>
+        <div id="time" class="hide">min: 0 sec: 0</div>
     </div>
 </body>
 
