@@ -129,23 +129,45 @@
             const shuffleCheck = document.getElementById("shuffle")
             const timedCheck = document.getElementById("timed")
             const remCorrectCheck = document.getElementById("remCorrect")
+
             let clock = null;
             let seconds = 0;
             let minutes = 0;
-
+            let checkCor = false;
+            let correctQuestions = []
             let shuffledQuestions, currentQuestionIndex
             //using the domLoaded function because the buttons need to be rendered before we can
             //add an event listener
             startButton.addEventListener('click', startGame)
             nextButton.addEventListener('click', () => {
-                currentQuestionIndex++
+                if(selectedOptions[2] && checkCor) {
+                    correctQuestions.push(shuffledQuestions[currentQuestionIndex])
+                    if(currentQuestionIndex == 0)
+                        shuffledQuestions.shift()
+                    else
+                        shuffledQuestions.splice(currentQuestionIndex, 1)
+                    checkCor = false
+                }
+                else {
+                    currentQuestionIndex++
+                }
                 setNextQuestion()
             })
             backButton.addEventListener('click', () => {
+                if(selectedOptions[2] && checkCor) {
+                    correctQuestions.push(shuffledQuestions[currentQuestionIndex])
+                    shuffledQuestions.splice(currentQuestionIndex, 1)
+                    checkCor = false
+                }
                 currentQuestionIndex--
                 setNextQuestion()
             })
             restartButton.addEventListener('click', () => {
+                if(selectedOptions[2] && checkCor) {
+                    correctQuestions.push(shuffledQuestions[currentQuestionIndex])
+                    shuffledQuestions.pop()
+                    checkCor = false
+                }
                 currentQuestionIndex = 0
                 setNextQuestion()
             })
@@ -175,6 +197,7 @@
                     startClock()
                     document.getElementById('time').classList.remove('hide')
                 }
+                
                 currentQuestionIndex = 0
                 questionContainerElement.classList.remove('hide')
                 setNextQuestion()
@@ -230,7 +253,7 @@
                     nextButton.classList.remove('hide')
                 }
                 else {
-                    nextButton.classList.remove('hide')
+                    backButton.classList.remove('hide')
                     restartButton.classList.remove('hide')
                 }
             }
@@ -249,6 +272,9 @@
             function selectAnswer(e) {
                 const selectedButton = e.target
                 const correct = selectedButton.dataset.correct
+                if(correct) {
+                    checkCor = true;
+                }
                 setStatusClass(document.body, correct)
                 Array.from(answerButtonsElement.children).forEach(button => {
                     setStatusClass(button, button.dataset.correct)
@@ -278,7 +304,7 @@
                     document.getElementById("info-container").appendChild(newDiv);
                     
                     let newP = document.createElement("p");
-                    newP.textContent = questions[currentQuestionIndex].info
+                    newP.textContent = shuffledQuestions[currentQuestionIndex].info
                     document.getElementById("extraInfo").appendChild(newP);
                 }
             };
